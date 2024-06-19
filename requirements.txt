@@ -1,0 +1,3 @@
+pandas
+transitions~=0.9.1
+graphviz

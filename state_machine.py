@@ -3,11 +3,13 @@ from collections import defaultdict
 from copy import deepcopy
 
 import pandas as pd
+from transitions import Machine
 from transitions.extensions import GraphMachine
 import os
+import platform
 
-
-os.environ["PATH"] += os.pathsep + 'C:/Program Files/Graphviz/bin/'
+if platform.system() == "Windows":
+    os.environ["PATH"] += os.pathsep + 'C:/Program Files/Graphviz/bin/'
 
 
 class CustomGraphMachine(GraphMachine):
@@ -27,7 +29,7 @@ class CustomGraphMachine(GraphMachine):
 
 
 class StateMachine(object):
-    def __init__(self, exercise_steps):
+    def __init__(self, exercise_steps, graph_machine=False):
         self.score = 0
         self.state = None
         self.steps = exercise_steps.set_index('step_id')  # get all the steps based on the step_id
@@ -60,11 +62,18 @@ class StateMachine(object):
             'dest': str(initial_state),
         }
         self.transitions.append(transition)
-        self.machine = CustomGraphMachine(model=self, states=states,
-                                          initial='start',
-                                          transitions=self.transitions,
-                                          auto_transitions=False,
-                                          )
+        if graph_machine:
+            self.machine = CustomGraphMachine(model=self, states=states,
+                                              initial='start',
+                                              transitions=self.transitions,
+                                              auto_transitions=False,
+                                              )
+        else:
+            self.machine = Machine(model=self, states=states,
+                                   initial='start',
+                                   transitions=self.transitions,
+                                   auto_transitions=False,
+                                   )
 
     def get_depth_level(self, source):
         """
@@ -125,7 +134,6 @@ class StateMachine(object):
         path, score = self.path_correctness(step_id_initial_step, initial_path, initial_score)
         return path, score
 
-
     def is_hint(self, data):
         """
         Check if the step is a hint
@@ -177,7 +185,6 @@ class StateMachine(object):
         path_type = 'primary'
         if self.depth[int(source)] > 1:
             path_type = 'helper'
-
 
         transition = {
             'trigger': trigger,
@@ -243,42 +250,49 @@ class StateMachine(object):
                 trigger_method()
 
 
+def generate_score(exercise_steps_path, exercise_answers_path, selected_exercise_type_id, weight_exercise_not_finished,
+                   select_student_id, graph_machine=False):
+    exercise_steps = pd.read_csv(exercise_steps_path)
+    exercise_answers = pd.read_csv(exercise_answers_path)
 
-# Load CSV files
-exercise_steps_path = 'files/exercise_steps_2024-05-27T07_18_53.350009Z.csv'
-exercise_answers_path = 'files/exercise_answers_2024-06-17T10_21_22.864852Z.csv'
-exercise_steps = pd.read_csv(exercise_steps_path)
-exercise_answers = pd.read_csv(exercise_answers_path)
+    # Filter steps and answers for the specific exercise
+    specific_exercise_steps = exercise_steps[exercise_steps['exercise_type_id'] == selected_exercise_type_id]
+    specific_exercise_answers = exercise_answers[(exercise_answers['exercise_type_id'] == selected_exercise_type_id) &
+                                                 (exercise_answers['student_id'] == select_student_id)]
+    sorted_answers = specific_exercise_answers.sort_values(by='ans_inserted_at')
 
-# Select a specific exercise_type_id to filter
-selected_exercise_type_id = 1497
-# Set the weight for the exercise not finished to subtract points
-weight_exercise_not_finished = 0.01
+    # group them by the exercise_tracking_finished_at
+    grouped_answers = sorted_answers.groupby('exercise_tracking_finished_at')
 
-# Filter steps and answers for the specific exercise
-specific_exercise_steps = exercise_steps[exercise_steps['exercise_type_id'] == selected_exercise_type_id]
-specific_exercise_answers = exercise_answers[exercise_answers['exercise_type_id'] == selected_exercise_type_id]
-sorted_answers = specific_exercise_answers.sort_values(by='ans_inserted_at')
+    for tracking_id, attempt_data in grouped_answers:
+        attempt_data = attempt_data.sort_values(by='ans_inserted_at')
 
-# group them by the exercise_tracking_finished_at
-grouped_answers = sorted_answers.groupby('exercise_tracking_finished_at')
+        print(f"Processing answers for tracking ID: {tracking_id}")
+        # Instantiate the state machine with the specific exercise steps
+        sm = StateMachine(exercise_steps=specific_exercise_steps, graph_machine=graph_machine)
+        # trigger the initialization transition
+        sm.initialization()
 
-for tracking_id, attempt_data in grouped_answers:
-    attempt_data = attempt_data.sort_values(by='ans_inserted_at')
+        # Process each answer for the exercise
+        sm.process_responses(attempt_data)
 
-    print(f"Processing answers for tracking ID: {tracking_id}")
-    # Instantiate the state machine with the specific exercise steps
-    sm = StateMachine(exercise_steps=specific_exercise_steps)
-    # trigger the initialization transition
-    sm.initialization()
-
-    # Process each answer for the exercise
-    sm.process_responses(attempt_data)
-
-    if not attempt_data['is_exercise_finished'].iloc[0]:
-        sm.score -= max_score * weight_exercise_not_finished
-    print(f"Total score for the exercise: {sm.score}")
-
-sm.show_graph('state_diagram')
+        if not attempt_data['is_exercise_finished'].iloc[0]:
+            sm.score -= sm.max_score * weight_exercise_not_finished
+        print(f"Total score for the exercise: {sm.score}")
+    if graph_machine:
+        sm.show_graph('state_diagram')
 
 
+if __name__ == '__main__':
+    # Load CSV files
+    exercise_steps_path = 'files/exercise_steps_2024-05-27T07_18_53.350009Z.csv'
+    exercise_answers_path = 'files/exercise_answers_2024-06-17T10_21_22.864852Z.csv'
+
+    # Select a specific exercise_type_id to filter
+    selected_exercise_type_id = 1497
+    # Set the weight for the exercise not finished to subtract points
+    weight_exercise_not_finished = 0.01
+    # Select a student ID to filter
+    select_student_id = 1447
+    generate_score(exercise_steps_path, exercise_answers_path,
+                   selected_exercise_type_id, weight_exercise_not_finished, select_student_id)
