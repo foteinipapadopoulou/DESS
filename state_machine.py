@@ -269,7 +269,7 @@ def generate_score(exercise_steps_path, exercise_answers_path, selected_exercise
 
         print(f"Processing answers for tracking ID: {tracking_id}")
         # Instantiate the state machine with the specific exercise steps
-        sm = StateMachine(exercise_steps=specific_exercise_steps)
+        sm = StateMachine(exercise_steps=specific_exercise_steps, graph_machine=graph_machine)
         # trigger the initialization transition
         sm.initialization()
 
@@ -295,4 +295,4 @@ if __name__ == '__main__':
     # Select a student ID to filter
     select_student_id = 1447
     generate_score(exercise_steps_path, exercise_answers_path,
-                   selected_exercise_type_id, weight_exercise_not_finished, select_student_id)
+                   selected_exercise_type_id, weight_exercise_not_finished, select_student_id, True)
