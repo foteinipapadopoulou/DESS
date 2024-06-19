@@ -36,7 +36,7 @@ class StateMachine(object):
         self.transitions = []
         self.primary_path, self.max_score = self.get_correctness_path_score()
         self.answered_questions = {}
-        self.K = 10
+        self.K = 6
         self.depth = {}
         self.hint_states = self.get_hint_states()
 
@@ -269,7 +269,7 @@ def generate_score(exercise_steps_path, exercise_answers_path, selected_exercise
 
         print(f"Processing answers for tracking ID: {tracking_id}")
         # Instantiate the state machine with the specific exercise steps
-        sm = StateMachine(exercise_steps=specific_exercise_steps, graph_machine=graph_machine)
+        sm = StateMachine(exercise_steps=specific_exercise_steps)
         # trigger the initialization transition
         sm.initialization()
 
@@ -277,7 +277,7 @@ def generate_score(exercise_steps_path, exercise_answers_path, selected_exercise
         sm.process_responses(attempt_data)
 
         if not attempt_data['is_exercise_finished'].iloc[0]:
-            sm.score -= sm.max_score * weight_exercise_not_finished
+            sm.score = max(0, sm.score - (sm.max_score * weight_exercise_not_finished))
         print(f"Total score for the exercise: {sm.score}")
     if graph_machine:
         sm.show_graph('state_diagram')
