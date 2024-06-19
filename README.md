@@ -61,7 +61,7 @@ The following are example logs and generated scores for `exercise_type_id=1497` 
 Processing answers for tracking ID: 2024-05-21T08:56:37
 Total score for the exercise: 30.0
 Processing answers for tracking ID: 2024-05-21T08:57:34
-Total score for the exercise: -0.3
+Total score for the exercise: 0
 Processing answers for tracking ID: 2024-05-21T11:40:57
 Total score for the exercise: 30.0
 Processing answers for tracking ID: 2024-05-25T09:50:21
