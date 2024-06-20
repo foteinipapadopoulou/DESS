@@ -1,4 +1,4 @@
-# Dynamic Exercise Scoring System
+# Digital Evaluation Subsystem
 
 ## Description
 In this repository, we have built a script that is based on state machine logic to calculate  individual scores for exercises created from the Enlight Ed software based on the responses provided in CSV files. The script filters responses by exercise type and student ID to provide targeted insights into individual performance and progress. The script also generates a visual diagram of the state machine to help visualize the state transitions.
