@@ -261,8 +261,8 @@ def generate_score(exercise_steps_path, exercise_answers_path, selected_exercise
                                                  (exercise_answers['student_id'] == select_student_id)]
     sorted_answers = specific_exercise_answers.sort_values(by='ans_inserted_at')
 
-    # group them by the exercise_tracking_finished_at
-    grouped_answers = sorted_answers.groupby('exercise_tracking_finished_at')
+    # group them by the exercise_tracking_id
+    grouped_answers = sorted_answers.groupby('exercise_tracking_id')
 
     for tracking_id, attempt_data in grouped_answers:
         attempt_data = attempt_data.sort_values(by='ans_inserted_at')
