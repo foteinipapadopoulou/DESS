@@ -111,7 +111,7 @@ class StateMachine(object):
 
             if math.isnan(row.possible_answer_next_step_id) and math.isnan(
                     row.step_next_step_id):  # the end of an exercise
-                if row.score != 0:
+                if not math.isnan(row.score):
                     score += row.score
                 return path, score
             elif math.isnan(row.possible_answer_next_step_id):  # the path of correctness contains a hint
@@ -140,7 +140,7 @@ class StateMachine(object):
         A hint is a step that does not have a possible_answer_id,
         possible_answer_next_step_id, score, format, answer_text, and answer_interpretation
         """
-        return pd.isna(data['format']) and pd.isna(data['score']) and pd.isna(data['possible_answer_id']) \
+        return pd.isna(data['score']) and pd.isna(data['possible_answer_id']) \
             and pd.isna(data['possible_answer_next_step_id']) and pd.isna(data['answer_text']) and pd.isna(
                 data['answer_interpretation'])
 
@@ -210,12 +210,12 @@ class StateMachine(object):
         if interpretation == 'correct' and count == 1 and path_type == 'primary':
             new_score = self.score + score
         elif interpretation == 'correct' and count > 1 and path_type == 'primary':
-            new_score = self.score + math.floor(score / count)
-        ### IS Helper
+            new_score = self.score + round(score / count, 1)
+            ### IS Helper
         if interpretation == 'correct' and count == 1 and path_type == 'helper':
             new_score = self.score + score * 1 / self.depth[int(id)]
         elif interpretation == 'correct' and count > 1 and path_type == 'helper':
-            new_score = self.score + score * 1 / self.depth[int(id)] * math.floor(score / count)
+            new_score = self.score + score * 1 / self.depth[int(id)] * round(score / count, 1)
             # is incorrect multiple times
         elif interpretation == 'incorrect' and count == self.K:
             new_score = self.score - score * count * 0.1
