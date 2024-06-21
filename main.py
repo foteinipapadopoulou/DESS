@@ -13,11 +13,13 @@ def main():
                         help='Weight for exercise not finished to subtract points (default: 0.01)')
     parser.add_argument('--graph', action='store_true',
                         help='Selected if you want to generate a graph (default: False)')
+    parser.add_argument('--K', type=int, nargs='?', default=6,
+                        help='Selected number of incorrect answers before reducing score (default: 6)')
 
     args = parser.parse_args()
 
     generate_score(args.steps_path, args.answers_path, args.exercise_type_id,
-                   args.weight, args.student_id, args.graph)
+                   args.weight, args.student_id, args.K, args.graph)
 
 
 if __name__ == '__main__':
