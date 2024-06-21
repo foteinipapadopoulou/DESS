@@ -43,6 +43,7 @@ To run the script, you will need to provide paths to the CSV files containing th
     --student_id (required): The ID of the student to filter the scores.
     --weight (optional): A float representing the weight to subtract from the total score for exercises not completed. Default is 0.01.
     --graph (optional): A boolean flag to generate a visual diagram of the state machine. Default is False.
+    --Κ (optional):  Attention threshold, an integer representing the number to allow students to input incorrect answers for the same question until lowering the total score. Default is 6.
 ## Example Command
 
 Run the script using the following command template:

@@ -29,14 +29,14 @@ class CustomGraphMachine(GraphMachine):
 
 
 class StateMachine(object):
-    def __init__(self, exercise_steps, graph_machine=False):
+    def __init__(self, exercise_steps, K=6, graph_machine=False):
         self.score = 0
         self.state = None
         self.steps = exercise_steps.set_index('step_id')  # get all the steps based on the step_id
         self.transitions = []
         self.primary_path, self.max_score = self.get_correctness_path_score()
         self.answered_questions = {}
-        self.K = 6
+        self.K = K
         self.depth = {}
         self.hint_states = self.get_hint_states()
 
@@ -251,7 +251,7 @@ class StateMachine(object):
 
 
 def generate_score(exercise_steps_path, exercise_answers_path, selected_exercise_type_id, weight_exercise_not_finished,
-                   select_student_id, graph_machine=False):
+                   select_student_id, K=6, graph_machine=False):
     exercise_steps = pd.read_csv(exercise_steps_path)
     exercise_answers = pd.read_csv(exercise_answers_path)
 
@@ -269,7 +269,7 @@ def generate_score(exercise_steps_path, exercise_answers_path, selected_exercise
 
         print(f"Processing answers for tracking ID: {tracking_id}")
         # Instantiate the state machine with the specific exercise steps
-        sm = StateMachine(exercise_steps=specific_exercise_steps, graph_machine=graph_machine)
+        sm = StateMachine(exercise_steps=specific_exercise_steps, K=K, graph_machine=graph_machine)
         # trigger the initialization transition
         sm.initialization()
 
