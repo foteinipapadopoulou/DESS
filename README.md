@@ -59,15 +59,15 @@ The script will output the calculated score directly to the console. If configur
 The following are example logs and generated scores for `exercise_type_id=1497` and `student_id=1447` provided in the file `exercise_answers_2024-06-17T10_21_22.864852Z.csv`:
 
 ```
-Processing answers for tracking ID: 2024-05-21T08:56:37
+Processing answers for tracking ID: 14690
 Total score for the exercise: 30.0
-Processing answers for tracking ID: 2024-05-21T08:57:34
+Processing answers for tracking ID: 14691
 Total score for the exercise: 0
-Processing answers for tracking ID: 2024-05-21T11:40:57
+Processing answers for tracking ID: 14694
 Total score for the exercise: 30.0
-Processing answers for tracking ID: 2024-05-25T09:50:21
+Processing answers for tracking ID: 14755
 Total score for the exercise: 25.0
-Processing answers for tracking ID: 2024-05-25T09:51:12
+Processing answers for tracking ID: 14756
 Total score for the exercise: 9.7
 ```
 * If the student id or the exercise type id is not found in the provided CSV files, the script will not output any logs or scores.
