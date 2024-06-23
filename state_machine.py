@@ -208,19 +208,20 @@ class StateMachine(object):
         new_score = self.score
         ### IS primary
         if interpretation == 'correct' and count == 1 and path_type == 'primary':
-            new_score = self.score + score
+            new_score += score
         elif interpretation == 'correct' and count > 1 and path_type == 'primary':
-            new_score = self.score + round(score / count, 1)
-            ### IS Helper
+            new_score += round(score / count, 1)
+        ### IS Helper
         if interpretation == 'correct' and count == 1 and path_type == 'helper':
-            new_score = self.score + score * 1 / self.depth[int(id)]
+            new_score += round(score / self.depth[int(id)], 1)
         elif interpretation == 'correct' and count > 1 and path_type == 'helper':
-            new_score = self.score + score * 1 / self.depth[int(id)] * round(score / count, 1)
+            new_score += round(score / self.depth[int(id)], 1) * round(score / count, 1)
             # is incorrect multiple times
         elif interpretation == 'incorrect' and count == self.K:
-            new_score = self.score - score * count * 0.1
+            new_score -= score * count * 0.1
 
         self.score = min(new_score, self.max_score)
+        self.score = max(0, self.score)
 
     def show_graph(self, filename='state_diagram'):
         # Draw the state diagram
